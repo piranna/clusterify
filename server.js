@@ -10,11 +10,10 @@ const workers = parseInt(process.env.WORKERS)
 // Worker, or single CPU
 if(cluster.isWorker || workers === 1)
 {
-  const [script] = process.argv.splice(2, 1)
+  // Remove clusterify script so worker is left as if it was executed directly
+  process.argv.splice(1, 1)
 
-  process.argv[1] = script  // Set worker script as if it was executed directly
-
-  require(require('path').resolve(script))
+  require(require('path').resolve(process.argv[1]))
 }
 
 // Master
