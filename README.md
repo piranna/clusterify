@@ -35,8 +35,9 @@ The best way is to configure the `start` script in your `package.json` file:
 When executing `npm start`, it will automatically create a cluster from your
 `server.js` script with a worker process for each one of your available CPUs. If
 you want to run it with a single process (for example, for testing purposses),
-you can be able to exec directly your `server.js` script or define the `WORKERS`
-environment variable to the number of worker processes you want.
+you can be able to exec directly your `server.js` script or define the
+`CLUSTERIFY_WORKERS` environment variable to the number of worker processes you
+want.
 
 ## Future work
 
