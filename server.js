@@ -8,7 +8,7 @@ let numWorkers = parseInt(process.env.CLUSTERIFY_WORKERS)
 
 
 // Worker, or single CPU
-if(cluster.isWorker || numWorkers === 1)
+if(cluster.isWorker || !numWorkers)
 {
   // Remove clusterify script so worker is left as if it was executed directly
   process.argv.splice(1, 1)
