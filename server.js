@@ -19,7 +19,7 @@ if(cluster.isWorker || !numWorkers)
 // Master
 const timeout = parseInt(process.env.CLUSTERIFY_TIMEOUT) || 5000
 
-const reSpawnedWorkers = new Set()
+const reSpawnedWorkers = new Map()
 const deleteSpawnedWorker = reSpawnedWorkers.delete.bind(reSpawnedWorkers)
 
 function spawnWorkers()
@@ -30,9 +30,7 @@ function spawnWorkers()
   {
     const {id} = cluster.fork()
 
-    setTimeout(deleteSpawnedWorker, timeout, id)
-
-    reSpawnedWorkers.add(id)
+    reSpawnedWorkers.set(id, setTimeout(deleteSpawnedWorker, timeout, id))
   }
 }
 
@@ -40,10 +38,17 @@ spawnWorkers()
 
 cluster.on('exit', function(worker, code, signal)
 {
-  // Worker exited on purposse, do nothing
+  // Worker exited on purpose, just only reduce number or workers
   if(worker.exitedAfterDisconnect) return numWorkers && numWorkers--
 
-  if(!reSpawnedWorkers.has(worker.id)) return spawnWorkers()
+  const {id} = worker
+  const timeout = reSpawnedWorkers.get(id)
+
+  // Worker crashed after start timeout, re-spawn it
+  if(timeout === undefined) return spawnWorkers()
+
+  clearTimeout(timeout)
+  reSpawnedWorkers.delete(id)
 
   // Set the exit code of master process to the exit code of the first
   // failed re-spawned worker process
